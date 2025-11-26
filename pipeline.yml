@@ -1,0 +1,39 @@
+name: Svelte Development Pipeline
+
+# 1.2 Trigger pipeline on push or PR to main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Get project code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Node.js (Svelte / SvelteKit recommended versions)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build Svelte or SvelteKit app
+      - name: Build Svelte application
+        run: npm run build
+
+      # Optional: run tests if your Svelte repo uses Vitest / Playwright / etc.
+      - name: Run tests
+        run: npm test
+        continue-on-error: false  # ensures pipeline fails if tests fail
+
+      # 1.3 Developer notifications are automatic
+      # GitHub will automatically notify commit authors & PR owners
