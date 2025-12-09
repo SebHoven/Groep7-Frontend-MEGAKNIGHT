@@ -1,19 +1,17 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
 
-  export let open = false;       // modal visibility
-  export let onClose = () => {}; // optional close handler
+  export let open = false;
+  export let onClose = () => {};
 
   const dispatch = createEventDispatcher();
 
-  // -------------------------
-  // Your state
-  // -------------------------
+
   let title = "";
   let typeOptions = [
-    { id: "water", label: "Water geven", emoji: "💧" },
-    { id: "plants", label: "Planten verzorgen", emoji: "🌱" },
-    { id: "trash", label: "Afval opruimen", emoji: "🗑️" }
+    { id: "water", label: "Water geven", icon: "💧" },
+    { id: "plants", label: "Planten verzorgen", icon: "🌱" },
+    { id: "trash", label: "Afval opruimen", icon: "🗑️" }
   ];
   let selectedType = typeOptions[0].id;
 
@@ -23,9 +21,6 @@
   let xp = 10;
   let assignees: string[] = [];
 
-  // -------------------------
-  // Step functions
-  // -------------------------
   function addStep() {
     steps = [...steps, ""];
   }
@@ -42,9 +37,6 @@
     steps = steps.map((s, i) => (i === index ? value : s));
   }
 
-  // -------------------------
-  // Assignee functions
-  // -------------------------
   function addAssignee() {
     const name = `Leerling ${assignees.length + 1}`;
     assignees = [...assignees, name];
@@ -54,9 +46,6 @@
     assignees = assignees.filter((_, i) => i !== index);
   }
 
-  // -------------------------
-  // Modal actions
-  // -------------------------
   function cancel() {
     dispatch("cancel");
     onClose();
@@ -78,18 +67,15 @@
 </script>
 
 {#if open}
-<!-- 🔥 MODAL BACKDROP -->
 <div
   class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
   on:click={onClose}
 >
-  <!-- 🔥 MODAL CONTENT (clicks inside do NOT close modal) -->
   <div
     class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full text-slate-800 overflow-y-auto max-h-[85vh]"
     on:click|stopPropagation
   >
 
-    <!-- 🔥 YOUR ORIGINAL FORM CONTENT STARTS HERE -->
     <h2 class="text-lg font-semibold mb-1">Nieuwe Taak Aanmaken</h2>
     <p class="text-sm text-slate-500 mb-6">Maak een nieuwe taak aan voor het schoolplein</p>
 
@@ -109,7 +95,7 @@
         class="w-full appearance-none rounded-lg border border-emerald-100 bg-emerald-50/30 px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-emerald-200"
       >
         {#each typeOptions as t}
-          <option value={t.id}>{t.emoji} {t.label}</option>
+          <option value={t.id}>{t.icon} {t.label}</option>
         {/each}
       </select>
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
@@ -214,7 +200,6 @@
       </button>
     </div>
 
-    <!-- 🔥 YOUR ORIGINAL FORM CONTENT ENDS HERE -->
   </div>
 </div>
 {/if}
