@@ -1,25 +1,24 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  interface Props {
+    open?: boolean;
+    onClose?: () => void;
+    onSubmit?: (task: any) => void;
+  }
 
-  export let open = false;
-  export let onClose = () => {};
+  let { open = $bindable(false), onClose = () => {}, onSubmit = () => {} }: Props = $props();
 
-  const dispatch = createEventDispatcher();
-
-
-  let title = "";
-  let typeOptions = [
+  let title = $state("");
+  let typeOptions = $state([
     { id: "water", label: "Water geven", icon: "💧" },
     { id: "plants", label: "Planten verzorgen", icon: "🌱" },
     { id: "trash", label: "Afval opruimen", icon: "🗑️" }
-  ];
-  let selectedType = typeOptions[0].id;
-
-  let description = "";
-  let steps: string[] = [""];
-  let date: string | null = null;
-  let xp = 10;
-  let assignees: string[] = [];
+  ]);
+  let selectedType = $state(typeOptions[0].id);
+  let description = $state("");
+  let steps = $state<string[]>([""]);
+  let date = $state<string>("");
+  let xp = $state(10);
+  let assignees = $state<string[]>([]);
 
   function addStep() {
     steps = [...steps, ""];
@@ -34,7 +33,7 @@
   }
 
   function updateStep(index: number, value: string) {
-    steps = steps.map((s, i) => (i === index ? value : s));
+    steps[index] = value;
   }
 
   function addAssignee() {
@@ -47,35 +46,66 @@
   }
 
   function cancel() {
-    dispatch("cancel");
+    // Reset form
+    title = "";
+    selectedType = typeOptions[0].id;
+    description = "";
+    steps = [""];
+    date = "";
+    xp = 10;
+    assignees = [];
+    
+    open = false;
     onClose();
   }
 
-  function next() {
+  function handleSubmit(e: Event) {
+    e.preventDefault();
+    
     const payload = {
-      title,
+      name: title,
       type: selectedType,
       description,
-      steps,
+      steps: steps.filter(s => s.trim() !== ""),
       date,
       xp,
-      assignees
+      assignees,
+      icon: typeOptions.find(t => t.id === selectedType)?.icon || ""
     };
-    dispatch("next", payload);
+    
+    onSubmit(payload);
+    
+    // Reset form
+    title = "";
+    selectedType = typeOptions[0].id;
+    description = "";
+    steps = [""];
+    date = "";
+    xp = 10;
+    assignees = [];
+    
+    open = false;
+  }
+
+  function handleBackdropClick() {
+    open = false;
     onClose();
   }
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 {#if open}
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
-  class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-  on:click={onClose}
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  onclick={handleBackdropClick}
 >
-  <div
+  <form
     class="bg-white rounded-xl shadow-xl p-6 max-w-md w-full text-slate-800 overflow-y-auto max-h-[85vh]"
-    on:click|stopPropagation
+    onclick={(e) => e.stopPropagation()}
+    onsubmit={handleSubmit}
   >
-
     <h2 class="text-lg font-semibold mb-1">Nieuwe Taak Aanmaken</h2>
     <p class="text-sm text-slate-500 mb-6">Maak een nieuwe taak aan voor het schoolplein</p>
 
@@ -84,6 +114,7 @@
       id="task-title"
       bind:value={title}
       placeholder="Bijv. Planten water geven"
+      required
       class="w-full rounded-lg border border-emerald-100 bg-emerald-50/30 px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-200"
     />
 
@@ -121,16 +152,15 @@
           <div class="flex items-center gap-2">
             <input
               id={"step-" + i}
-              class="flex-1 rounded-lg border border-emerald-100 bg-emerald-50/30 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-200"
               bind:value={steps[i]}
-              on:input={(e) => updateStep(i, (e.target as HTMLInputElement).value)}
+              class="flex-1 rounded-lg border border-emerald-100 bg-emerald-50/30 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-200"
               placeholder={"Stap " + (i + 1)}
               aria-label={"Stap " + (i + 1)}
             />
             <button
               type="button"
               class="text-slate-500 hover:text-rose-500 p-1 rounded"
-              on:click={() => removeStep(i)}
+              onclick={() => removeStep(i)}
               aria-label={"Verwijder stap " + (i + 1)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -142,7 +172,7 @@
       </div>
     </fieldset>
 
-    <button type="button" on:click={addStep} class="w-full flex items-center justify-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50/20 px-4 py-2 text-emerald-700 mb-4 hover:bg-emerald-50">
+    <button type="button" onclick={addStep} class="w-full flex items-center justify-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50/20 px-4 py-2 text-emerald-700 mb-4 hover:bg-emerald-50">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
       Stap toevoegen
     </button>
@@ -181,25 +211,24 @@
       {#each assignees as a, i (i)}
         <div class="flex items-center justify-between gap-3 rounded-lg border border-emerald-100 bg-emerald-50/20 px-3 py-2">
           <div class="text-sm">{a}</div>
-          <button type="button" class="text-rose-500 hover:underline" on:click={() => removeAssignee(i)}>Verwijder</button>
+          <button type="button" class="text-rose-500 hover:underline" onclick={() => removeAssignee(i)}>Verwijder</button>
         </div>
       {/each}
 
-      <button type="button" on:click={addAssignee} class="w-full rounded-lg border border-emerald-100 bg-white px-4 py-2 text-emerald-700 hover:bg-emerald-50">
+      <button type="button" onclick={addAssignee} class="w-full rounded-lg border border-emerald-100 bg-white px-4 py-2 text-emerald-700 hover:bg-emerald-50">
         + Leerling toevoegen
       </button>
     </div>
 
     <div class="flex items-center justify-between gap-3">
-      <button type="button" on:click={cancel} class="px-4 py-2 rounded-full border border-slate-200 bg-white text-slate-700">
+      <button type="button" onclick={cancel} class="px-4 py-2 rounded-full border border-slate-200 bg-white text-slate-700">
         Annuleren
       </button>
 
-      <button type="button" on:click={next} class="px-4 py-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700">
-        Volgende: Plaats op kaart
+      <button type="submit" class="px-4 py-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700">
+        Taak Toevoegen
       </button>
     </div>
-
-  </div>
+  </form>
 </div>
 {/if}

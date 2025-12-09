@@ -28,13 +28,22 @@ export const getPromisesData = async (/** @type {any} */ urls) => {
  */
 export const postData = async (/** @type {RequestInfo | URL} */ url, /** @type {any} */ data) => {
     try {
+        console.log('postData - URL:', url);
+        console.log('postData - Data being stringified:', data);
+        console.log('postData - JSON stringified:', JSON.stringify(data));
+        
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        return await response.json();
+        
+        const result = await response.json();
+        console.log('postData - Response:', result);
+        
+        return result;
     } catch (error) {
+        console.error('postData - Error:', error);
         return { error };
     }
 };
