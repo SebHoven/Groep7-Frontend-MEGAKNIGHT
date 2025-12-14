@@ -1,11 +1,13 @@
 <script>
   import Calendar from '$lib/components/Agenda.svelte';
   import { onMount } from 'svelte';
+  import { createTask } from '$lib/helpers/taskApi.js';
 
   const API = 'http://localhost:3012/tasks';
   let tasksy = [];
   let showForm = false;
   let prefillDate = '';
+  let statusMessage = '';
 
   async function fetchTasks() {
     try {
@@ -17,10 +19,36 @@
     }
   }
 
-  function handleTaskSubmit() {
-    // Na submit opnieuw fetchen
-    fetchTasks();
-  }
+  const handleTaskSubmit = async (taskDataEvent) => {
+    statusMessage = 'Submitting...';
+
+    try {
+      const taskData = taskDataEvent && taskDataEvent.detail ? taskDataEvent.detail : taskDataEvent;
+      const stepsArray = Array.isArray(taskData.steps) ? taskData.steps : [];
+
+      const newTask = {
+        name: taskData.name,
+        description: taskData.description,
+        xp: taskData.xp,
+        date: taskData.date,
+        icon: taskData.icon,
+        teacherId: 1,
+        steps: stepsArray.map((stepDescription) => ({ description: stepDescription }))
+      };
+
+      console.log('newTask being sent:', newTask);
+      console.log('newTask.steps:', newTask.steps);
+      
+      const createdTask = await createTask(newTask);
+      console.log('API response:', createdTask);
+
+      statusMessage = 'Task created! Reloading...';
+      fetchTasks();
+      // location.reload();
+    } catch (err) {
+      statusMessage = 'Error: ' + err.message;
+    }
+  };
 
   onMount(() => fetchTasks());
 </script>
