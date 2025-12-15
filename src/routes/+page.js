@@ -1,4 +1,4 @@
-const data = await fetch(`${import.meta.env.PUBLIC_API_URL}/teachers`);
+const data = await fetch(`https://groep7-backend-megaknight-ewi7.onrender.com/teachers`);
 
 console.log(await data.json());
 

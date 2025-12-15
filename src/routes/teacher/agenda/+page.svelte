@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import { createTask } from '$lib/helpers/taskApi.js';
 
-  const API = `${import.meta.env.PUBLIC_API_URL}/tasks`;
+  const API = `https://groep7-backend-megaknight-ewi7.onrender.com/tasks`;
   let tasksy = [];
   let showForm = false;
   let prefillDate = '';

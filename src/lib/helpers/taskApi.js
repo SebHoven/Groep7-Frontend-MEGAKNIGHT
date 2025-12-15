@@ -1,5 +1,6 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 import { getData, postData, putData, deleteData } from './ajaxhelper.js';
+PUBLIC_API_URL = "https://groep7-backend-megaknight-ewi7.onrender.com";
 
 export const getTasks = () => getData(`${PUBLIC_API_URL}/tasks`);
 export const getTaskById = (/** @type {any} */ id) => getData(`${PUBLIC_API_URL}/tasks/${id}`);
