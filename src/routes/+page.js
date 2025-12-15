@@ -1,4 +1,4 @@
-const data = await fetch('http://localhost:3012/teachers');
+const data = await fetch('teachers');
 
 console.log(await data.json());
 

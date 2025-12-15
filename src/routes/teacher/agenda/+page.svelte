@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import { createTask } from '$lib/helpers/taskApi.js';
 
-  const API = 'http://localhost:3012/tasks';
+  const API = `${import.meta.env.PUBLIC_API_URL}/tasks`;
   let tasksy = [];
   let showForm = false;
   let prefillDate = '';
