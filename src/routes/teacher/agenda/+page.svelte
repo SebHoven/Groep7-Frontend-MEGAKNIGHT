@@ -26,7 +26,7 @@
       const res = await fetch(API);
       const json = await res.json();
       tasksy = json.data || [];
-      console.log('Fetched tasks:', tasksy);
+      //console.log('Fetched tasks:', tasksy);
     } catch (err) {
       console.error(err);
     }
@@ -93,6 +93,7 @@
   {/if}
 </div>
 
+<!-- Laat taak details zien -->
 {#if showDetail}
   <aside class="fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-2xl z-50 overflow-auto p-6 rounded-l-2xl">
     <div class="flex items-start justify-between mb-4">
@@ -103,6 +104,7 @@
       </div>
     </div>
 
+    <!-- Taak details -->
     {#if selectedTask}
       <div class="flex items-center gap-4 mb-4">
         <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center text-2xl">{selectedTask.icon || '📌'}</div>
@@ -115,7 +117,13 @@
 
       <div class="text-sm text-gray-700 mb-4">
         <div class="flex items-center gap-2 mb-2"><span class="text-gray-500">📅</span> Datum: <span class="ml-1 font-medium">{selectedTask.date ? new Date(selectedTask.date).toLocaleDateString('nl-NL') : 'Geen datum'}</span></div>
-        <div class="flex items-center gap-2"><span class="text-gray-500">👤</span> Toegewezen aan: <span class="ml-1 font-medium">{selectedTask.assigned || 'Niet toegewezen'}</span></div>
+        <div class="flex items-center gap-2"><span class="text-gray-500">👤</span> Toegewezen aan: 
+          {#if selectedTask.taskstudent && selectedTask.taskstudent.length}
+            <span class="ml-1 font-medium">{selectedTask.taskstudent.map(ts => ts.student.name).join(', ')}</span>
+          {:else}
+            <span class="ml-1 font-medium">Niet toegewezen</span>
+          {/if}
+        </div>
       </div>
 
       <h4 class="text-lg font-semibold mb-2">Stappen:</h4>
