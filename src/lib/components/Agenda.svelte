@@ -1,5 +1,6 @@
 <script>
   // @ts-nocheck
+  import { goto } from '$app/navigation';
   import TaskModal from '$lib/components/AddTask.svelte';
   import { onMount, createEventDispatcher } from 'svelte';
 
@@ -103,7 +104,7 @@
       <button class="w-8 h-8 rounded-full border" on:click={nextMonth}>›</button>
     </div>
     <div class="ml-auto">
-      <button class="bg-green-600 text-white px-4 py-2 rounded-full" on:click={() => showForm = true}>+ Nieuwe Taak</button>
+      <button class="bg-green-600 text-white px-4 py-2 rounded-full" on:click={() => { prefillDate = isoDate(new Date()); showForm = true; }}>+ Nieuwe Taak</button>
     </div>
   </div>
 
@@ -145,6 +146,19 @@
   {#if statusMessage}
     <p class="mt-3 text-sm">{statusMessage}</p>
   {/if}
+  
+  <TaskModal
+    bind:open={showForm}
+    onClose={() => showForm = false}
+    onSubmit={(data) => {
+      showForm = false;
 
-  <TaskModal bind:open={showForm} onClose={() => showForm = false} onSubmit={(data) => dispatch('taskSubmit', data)} {prefillDate}/>
+      goto('/teacher/home', {
+        state: {
+          task: JSON.stringify(data)
+        }
+      });
+    }}
+    {prefillDate}
+  />
 </div>
