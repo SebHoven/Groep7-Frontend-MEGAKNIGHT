@@ -3,9 +3,16 @@
     open?: boolean;
     onClose?: () => void;
     onSubmit?: (task: any) => void;
+    prefillDate?: string;
   }
 
-  let { open = $bindable(false), onClose = () => {}, onSubmit = () => {} }: Props = $props();
+  let { open = $bindable(false), onClose = () => {}, onSubmit = () => {}, prefillDate = "" }: Props = $props();
+
+  $effect(() => {
+    if (prefillDate) {
+      date = prefillDate;
+    }
+  });
 
   let title = $state("");
   let typeOptions = $state([
