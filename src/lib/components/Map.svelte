@@ -1,55 +1,52 @@
 <script lang="ts">
-  export let title: string = "Jouw Schoolplein";
+  import { onMount } from 'svelte';
 
-  let backgroundImage = "";
-  let aspect = 1; // width / height verhouding van de gekozen afbeelding
+  let backgroundImage = '';
+  let mapId: number | null = null;
 
-  function FileUpload(event: Event) {
-    const input = event.target as HTMLInputElement | null;
-    if (!input || !input.files?.length) return;
+  async function loadMap() {
+    const res = await fetch('http://localhost:3012/maps/latest');
+    const map = await res.json();
 
-    const file = input.files[0];
-    const reader = new FileReader();
-
-    reader.onload = e => {
-      const result = e.target?.result;
-      if (typeof result !== "string") return;
-
-      backgroundImage = `url('${result}')`;
-
-      // Werkelijke afmetingen uitlezen
-      const img = new Image();
-      img.onload = () => {
-        aspect = img.width / img.height;
-      };
-      img.src = result;
-    };
-
-    reader.readAsDataURL(file);
+    if (map) {
+      mapId = map.id;
+      backgroundImage = `url(http://localhost:3012${map.imageUrl})`;
+    }
   }
+
+  async function FileUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const formData = new FormData();
+    formData.append('file', input.files[0]);
+    formData.append('name', 'Schoolplein');
+
+    const res = await fetch('http://localhost:3012/maps', {
+      method: 'POST',
+      body: formData
+    });
+
+    const map = await res.json();
+    mapId = map.id;
+    backgroundImage = `url(http://localhost:3012${map.imageUrl})`;
+  }
+
+  onMount(loadMap);
 </script>
 
-<div class="bg-white rounded-xl shadow p-4">
-  <h1 class="text-xl font-bold mb-4">{title}</h1>
+<!-- File input -->
+<input 
+  type="file" 
+  accept="image/*" 
+  on:change={FileUpload} 
+  class="mb-4 p-2 w-full"
+/>
 
-  <!-- File input bovenaan -->
-  <input 
-    type="file"
-    accept="image/*"
-    on:change={FileUpload}
-    class="mb-4 p-2 block w-full"
-  />
-
-  <!-- RESPONSIVE IMAGE CONTAINER -->
+<!-- Image container -->
+<div class="w-full h-[400px] rounded-xl shadow-lg overflow-hidden border border-gray-300 bg-gray-200">
   <div
-    class="border rounded-xl overflow-hidden bg-gray-200 w-full"
-    style="
-      background-image: {backgroundImage};
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      padding-top: {100 / aspect}%;
-    "
+    class="w-full h-full bg-center bg-contain bg-no-repeat"
+    style="background-image: {backgroundImage};"
   ></div>
 </div>
-
