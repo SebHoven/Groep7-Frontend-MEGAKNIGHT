@@ -1,15 +1,18 @@
 <script lang="ts">
+  import { PUBLIC_API_URL } from '$env/static/public';
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import TaskDetail from './TaskDetail.svelte';
 
   export let title: string = "Jouw Schoolplein";
   export let createTask: (data: any) => Promise<any>;
+  export let isTeacher: boolean = false;
+
   // map image
   let backgroundImage = "";
   let aspect = 1;
 
-  const API = 'http://localhost:3012/tasks';
+  const API = `${PUBLIC_API_URL}/tasks`;
   let tasks: any[] = [];
   const task = JSON.parse(page.state.task || '{}');
 
@@ -19,8 +22,8 @@
   let selectedTask = null;
   let showDetail = false;
 
-  function openDetail(t: any) {
-    selectedTask = t;
+  function openDetail(task: any) {
+    selectedTask = task;
     showDetail = true;
   }
 
@@ -29,12 +32,8 @@
     selectedTask = null;
   }
 
-  function isDone(t: any) {
-    return t.tasksteps && t.tasksteps.every((s: any) => s.done);
-  }
-
-  function isLate(t: any) {
-    return new Date(t.date) < new Date() && !isDone(t);
+  function isLate(task: any) {
+    return new Date(task.date) < new Date() && !task.completed;
   }
 
   async function fetchTasks() {
@@ -124,17 +123,19 @@
 <div class="bg-white rounded-xl shadow p-4">
   <h1 class="text-xl font-bold mb-4">{title}</h1>
 
-  <!-- File input bovenaan -->
-  <input 
-    type="file"
-    accept="image/*"
-    on:change={FileUpload}
-    class="mb-4 p-2 block w-full"
-  />
+  {#if isTeacher}
+    <!-- File input bovenaan -->
+    <input 
+      type="file"
+      accept="image/*"
+      onchange={FileUpload}
+      class="mb-4 p-2 block w-full"
+    />
+  {/if}
 
-  <!-- RESPONSIVE IMAGE CONTAINER -->
   <div
-    class="relative border rounded-xl overflow-hidden bg-gray-200 w-full cursor-crosshair"
+    class="relative border rounded-xl overflow-hidden bg-gray-200 w-full"
+    class:cursor-crosshair={isTeacher}
     style="
       background-image: {backgroundImage};
       background-size: contain;
@@ -142,10 +143,10 @@
       background-position: center;
       padding-top: {100 / aspect}%;
     "
-    on:mousemove={onMove}
-    on:click={placePin}
+    onmousemove={onMove}
+    onclick={placePin}
   >
-    <!-- PIN PREVIEW -->
+    <!-- Pin -->
     {#if placing}
       <div
         class="absolute pointer-events-none"
@@ -181,14 +182,14 @@
             top: {t.y}px;
             transform: translate(-50%, -100%);
           "
-          on:click={() => openDetail(t)}
+          onclick={() => openDetail(t)}
         >
           <div class="relative">
             <div
               class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm"
-              class:bg-green-500={isDone(t)}
+              class:bg-green-500={t.completed}
               class:bg-red-500={isLate(t)}
-              class:bg-blue-500={!isDone(t) && !isLate(t)}
+              class:bg-blue-500={!t.completed && !isLate(t)}
             >
               {t.icon || '📌'}
             </div>
@@ -204,5 +205,5 @@
 </div>
 
 <!-- Laat taak details zien -->
-<TaskDetail bind:open={showDetail} task={selectedTask} onClose={closeDetail} />
+<TaskDetail bind:open={showDetail} task={selectedTask} onClose={closeDetail} isTeacher={isTeacher} />
 

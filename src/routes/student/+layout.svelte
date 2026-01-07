@@ -6,9 +6,7 @@
 <div class="min-h-screen bg-green-50 pb-16">
   <Header username="test" xp={0} role="student" />
 
-  <main class="p-4">
-    <slot />
-  </main>
+  <slot />
 
   <NavStudent />
 </div>

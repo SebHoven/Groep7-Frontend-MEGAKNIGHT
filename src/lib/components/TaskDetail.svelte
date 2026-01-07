@@ -1,22 +1,39 @@
 <script lang="ts">
+  import { completeTask, toggleTaskStep, updateTask } from '$lib/helpers/taskApi.js';
+
   interface Props {
     open?: boolean;
     task?: any;
+    isTeacher?: boolean;
     onClose?: () => void;
   }
 
-  let { open = $bindable(false), task = null, onClose = () => {} }: Props = $props();
+  let { open = $bindable(false), task = $bindable(null), isTeacher = false, onClose = () => {} }: Props = $props();
+
+  async function completeCurrentTask() {
+    if (!task) return;
+    try {
+      await completeTask(task.id);
+      onClose();
+    } catch (err) {
+      console.error('Error completing task:', err);
+    }
+  }
+
+  let isDisabled = !isTeacher || (task?.tasksteps && task.tasksteps.length > 0 && !task.tasksteps.every(taskstep => taskstep.completed)) || task?.completed;
 </script>
 
 {#if open}
   <aside class="fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-2xl z-50 overflow-auto p-6 rounded-l-2xl">
-    <div class="flex items-start justify-between mb-4">
-      <button on:click={onClose} class="text-emerald-700 font-semibold">← Terug</button>
-      <div class="flex items-center gap-2">
-        <button class="px-3 py-1 border rounded text-emerald-700">Bewerken</button>
-        <button class="px-3 py-1 bg-red-600 text-white rounded">Verwijderen</button>
+      <div class="flex items-start justify-between mb-4">
+        <button onclick={onClose} class="text-emerald-700 font-semibold">← Terug</button>
+        {#if isTeacher}
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-1 border rounded text-emerald-700">Bewerken</button>
+            <button class="px-3 py-1 bg-red-600 text-white rounded">Verwijderen</button>
+          </div>
+        {/if}
       </div>
-    </div>
 
     <!-- Taak details -->
     {#if task}
@@ -43,10 +60,10 @@
       <h4 class="text-lg font-semibold mb-2">Stappen:</h4>
       <div class="space-y-3 mb-6">
         {#if task.tasksteps && task.tasksteps.length}
-          {#each task.tasksteps as s, idx}
+          {#each task.tasksteps as taskstep}
             <label class="flex items-center gap-3 bg-emerald-50 p-3 rounded-lg">
-              <input type="checkbox" bind:checked={s.done} />
-              <span class="text-sm">{s.text}</span>
+              <input type="checkbox" checked={taskstep.completed} onchange={async () => { taskstep.completed = !taskstep.completed; await toggleTaskStep(taskstep.id); }} />
+              <span class="text-sm">{taskstep.text}</span>
             </label>
           {/each}
         {:else}
@@ -54,7 +71,13 @@
         {/if}
       </div>
 
-      <button class="w-full bg-emerald-600 text-white py-3 rounded-lg">Voltooi alle stappen eerst</button>
+      <button 
+        class="w-full py-3 rounded-lg text-white {isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600'}"
+        disabled={isDisabled}
+        onclick={completeCurrentTask}
+      >
+        {#if !task.completed}{#if isTeacher}Voltooi taak{/if}{#if !isTeacher}Alleen leraar kan voltooien{/if}{/if}{#if task.completed}Taak is voltooid!{/if}
+      </button>
     {/if}
   </aside>
 {/if}

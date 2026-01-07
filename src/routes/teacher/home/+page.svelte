@@ -5,4 +5,4 @@
 
 <p class="text-2xl font-bold mb-4">Jouw Schoolplein</p>
 
-<Map title="Plaats hier jouw schoolplein!" {createTask}/>
+<Map title="Plaats hier jouw schoolplein!" {createTask} isTeacher={true} />
