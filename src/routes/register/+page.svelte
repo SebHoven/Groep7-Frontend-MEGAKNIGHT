@@ -1,4 +1,3 @@
-<!-- src/routes/register/+page.svelte -->
 <script>
     import { goto } from '$app/navigation';
     import RegisterCard from '$lib/components/RegisterCard.svelte';
@@ -8,13 +7,13 @@
     let email = '';
     let password = '';
     let confirmPassword = '';
+    let role = 'student';
     
     let message = '';
     let isError = false;
     let isLoading = false;
 
     async function handleRegister() {
-        // Validation
         if (!name || !email || !password || !confirmPassword) {
             message = 'Please fill in all fields.';
             isError = true;
@@ -37,12 +36,12 @@
         message = '';
         
         try {
-            const result = await authService.register(name, email, password);
+            // @ts-ignore
+            const result = await authService.register(name, email, password, role);
             
             if (result.success) {
                 message = 'Registration successful! Redirecting to login...';
                 isError = false;
-                console.log('Registration successful for:', email);
 
                 setTimeout(() => {
                     goto('/login');
@@ -50,7 +49,6 @@
             } else {
                 message = result.message || 'Registration failed.';
                 isError = true;
-                console.log('Registration failed for:', email);
             }
         } catch (error) {
             message = 'Network error. Please make sure the backend is running.';
@@ -70,6 +68,7 @@
         bind:email={email}
         bind:password={password}
         bind:confirmPassword={confirmPassword}
+        bind:role={role}
         message={message}
         isError={isError}
         isLoading={isLoading}

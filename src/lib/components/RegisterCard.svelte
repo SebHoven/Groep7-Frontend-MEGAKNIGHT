@@ -1,4 +1,3 @@
-<!-- src/lib/components/RegisterCard.svelte -->
 <script>
     import { createEventDispatcher } from 'svelte';
 
@@ -8,6 +7,7 @@
     export let email = '';
     export let password = '';
     export let confirmPassword = '';
+    export let role = 'student';
     export let isLoading = false;
 
     const dispatch = createEventDispatcher();
@@ -19,57 +19,77 @@
 
 <div class="register-wrapper">
     <div class="register-container">
-        <h2>Maak Account</h2>
+        <h2>Create Account</h2>
         
-        <form on:submit|preventDefault={handleSubmit}>
-            <label for="name">Naam</label>
-            <input 
-                type="text" 
-                id="name" 
-                name="name" 
-                required 
-                bind:value={name}
-                disabled={isLoading}
-                placeholder="Naam"
-            />
+        <div class="space-y-6">
+            <div>
+                <label for="role">I am a</label>
+                <select 
+                    id="role" 
+                    bind:value={role}
+                    disabled={isLoading}
+                >
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                </select>
+            </div>
 
-            <label for="email">Email</label>
-            <input 
-                type="email" 
-                id="email" 
-                name="email" 
-                required 
-                bind:value={email}
-                disabled={isLoading}
-                placeholder="john@example.com"
-            />
+            <div>
+                <label for="name">Name</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    required 
+                    bind:value={name}
+                    disabled={isLoading}
+                    placeholder="John Doe"
+                />
+            </div>
 
-            <label for="password">Wachtwoord</label>
-            <input 
-                type="password" 
-                id="password" 
-                name="password" 
-                required 
-                bind:value={password}
-                disabled={isLoading}
-                placeholder="Tenminste 8 tekens"
-            />
+            <div>
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    bind:value={email}
+                    disabled={isLoading}
+                    placeholder="john@example.com"
+                />
+            </div>
 
-            <label for="confirmPassword">Bevestig Wachtwoord</label>
-            <input 
-                type="password" 
-                id="confirmPassword" 
-                name="confirmPassword" 
-                required 
-                bind:value={confirmPassword}
-                disabled={isLoading}
-                placeholder="opnieuw wachtwoord invoeren"
-            />
+            <div>
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    bind:value={password}
+                    disabled={isLoading}
+                    placeholder="At least 8 characters"
+                />
+            </div>
 
-            <button type="submit" disabled={isLoading}>
-                {isLoading ? 'Creating account...' : 'Registreer'}
+            <div>
+                <label for="confirmPassword">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    name="confirmPassword" 
+                    required 
+                    bind:value={confirmPassword}
+                    disabled={isLoading}
+                    placeholder="Re-enter password"
+                />
+            </div>
+
+            <button on:click={handleSubmit} disabled={isLoading}>
+                {isLoading ? 'Creating account...' : 'Register'}
             </button>
-        </form>
+        </div>
 
         {#if message}
             <div class="message" class:error={isError} class:success={!isError}>
@@ -78,7 +98,7 @@
         {/if}
 
         <div class="login-link">
-            Heb je al een account <a href="/login">Log in</a>
+            Already have an account? <a href="/login">Log in</a>
         </div>
     </div>
 </div>
@@ -110,33 +130,34 @@
         font-size: 1.8em;
     }
 
-    form {
-        display: flex;
-        flex-direction: column;
+    .space-y-6 > * + * {
+        margin-top: 20px;
     }
 
     label {
+        display: block;
         margin-bottom: 7px;
         font-weight: bold;
         color: #388e3c;
         font-size: 1.05em;
     }
 
-    input {
+    input, select {
+        width: 100%;
         padding: 12px;
-        margin-bottom: 20px;
         border: 1px solid #a5d6a7;
         border-radius: 4px;
         font-size: 17px;
         background-color: #ffffff;
     }
 
-    input:disabled {
+    input:disabled, select:disabled {
         background-color: #f5f5f5;
         cursor: not-allowed;
     }
 
     button {
+        width: 100%;
         padding: 12px;
         background-color: #4CAF50;
         color: white;
