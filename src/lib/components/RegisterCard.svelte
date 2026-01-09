@@ -19,23 +19,23 @@
 
 <div class="register-wrapper">
     <div class="register-container">
-        <h2>Create Account</h2>
+        <h2>Maak Account</h2>
         
         <div class="space-y-6">
             <div>
-                <label for="role">I am a</label>
+                <label for="role">Ik ben een</label>
                 <select 
                     id="role" 
                     bind:value={role}
                     disabled={isLoading}
                 >
                     <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
+                    <option value="teacher">Leraar</option>
                 </select>
             </div>
 
             <div>
-                <label for="name">Name</label>
+                <label for="name">Naam</label>
                 <input 
                     type="text" 
                     id="name" 
@@ -69,7 +69,7 @@
                     required 
                     bind:value={password}
                     disabled={isLoading}
-                    placeholder="At least 8 characters"
+                    placeholder="Minstens 8 letters"
                 />
             </div>
 
@@ -82,12 +82,12 @@
                     required 
                     bind:value={confirmPassword}
                     disabled={isLoading}
-                    placeholder="Re-enter password"
+                    placeholder="Opnieuw password"
                 />
             </div>
 
             <button on:click={handleSubmit} disabled={isLoading}>
-                {isLoading ? 'Creating account...' : 'Register'}
+                {isLoading ? 'Account aanmaken...' : 'Registreer'}
             </button>
         </div>
 
@@ -98,7 +98,7 @@
         {/if}
 
         <div class="login-link">
-            Already have an account? <a href="/login">Log in</a>
+            Al een account? <a href="/login">Log in</a>
         </div>
     </div>
 </div>
