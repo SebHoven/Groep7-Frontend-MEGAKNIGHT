@@ -2,6 +2,10 @@
   import { PUBLIC_API_URL } from '$env/static/public';
   import { page } from '$app/state';
   import { onMount } from 'svelte';
+
+  let backgroundImage = '';
+  let mapId: number | null = null;
+  import { page } from '$app/state';
   import TaskDetail from './TaskDetail.svelte';
 
   export let title: string = "Jouw Schoolplein";
@@ -9,7 +13,6 @@
   export let isTeacher: boolean = false;
 
   // map image
-  let backgroundImage = "";
   let aspect = 1;
 
   const API = `${PUBLIC_API_URL}/tasks`;
@@ -46,27 +49,33 @@
     }
   }
 
-  function FileUpload(event: Event) {
-    const input = event.target as HTMLInputElement | null;
-    if (!input || !input.files?.length) return;
+  async function loadMap() {
+    const res = await fetch('http://localhost:3012/maps/latest');
+    const map = await res.json();
 
-    const file = input.files[0];
-    const reader = new FileReader();
+    if (map) {
+      mapId = map.id;
+      backgroundImage = `url(http://localhost:3012${map.imageUrl})`;
+    }
+  }
 
-    reader.onload = e => {
-      const result = e.target?.result;
-      if (typeof result !== "string") return;
+  async function FileUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
 
-      backgroundImage = `url('${result}')`;
+    const formData = new FormData();
+    formData.append('file', input.files[0]);
+    formData.append('name', 'Schoolplein');
 
-      // Werkelijke afmetingen uitlezen
-      const img = new Image();
-      img.onload = () => {
-        aspect = img.width / img.height;
-      };
-      img.src = result;
-    };
+    const res = await fetch('http://localhost:3012/maps', {
+      method: 'POST',
+      body: formData
+    });
 
+    const map = await res.json();
+    mapId = map.id;
+    backgroundImage = `url(http://localhost:3012${map.imageUrl})`;
+  }
   reader.readAsDataURL(file);
   }
 
@@ -120,8 +129,8 @@
   });
 </script>
 
-<div class="bg-white rounded-xl shadow p-4">
-  <h1 class="text-xl font-bold mb-4">{title}</h1>
+  onMount(loadMap);
+</script>
 
   {#if isTeacher}
     <!-- File input bovenaan -->
