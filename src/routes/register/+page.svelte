@@ -15,19 +15,19 @@
 
     async function handleRegister() {
         if (!name || !email || !password || !confirmPassword) {
-            message = 'Please fill in all fields.';
+            message = 'Vul alsjeblieft alle velden in.';
             isError = true;
             return;
         }
 
         if (password !== confirmPassword) {
-            message = 'Passwords do not match.';
+            message = 'Wachtwoorden komen niet overeen.';
             isError = true;
             return;
         }
 
         if (password.length < 8) {
-            message = 'Password must be at least 8 characters long.';
+            message = 'Wachtwoord moet minstens 8 tekens zijn.';
             isError = true;
             return;
         }
@@ -40,18 +40,18 @@
             const result = await authService.register(name, email, password, role);
             
             if (result.success) {
-                message = 'Registration successful! Redirecting to login...';
+                message = 'Registratie successvol! Naar de login...';
                 isError = false;
 
                 setTimeout(() => {
                     goto('/login');
                 }, 1500);
             } else {
-                message = result.message || 'Registration failed.';
+                message = result.message || 'Registratie mislukt.';
                 isError = true;
             }
         } catch (error) {
-            message = 'Network error. Please make sure the backend is running.';
+            message = 'Netwerk fout. Probeer het later opnieuw.';
             isError = true;
             console.error('Registration error:', error);
         } finally {
