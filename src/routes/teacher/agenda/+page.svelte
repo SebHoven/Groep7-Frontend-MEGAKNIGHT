@@ -96,4 +96,4 @@
 </div>
 
 <!-- Laat taak details zien -->
-<TaskDetail bind:open={showDetail} task={selectedTask} onClose={closeDetail} />
+<TaskDetail bind:open={showDetail} task={selectedTask} onClose={closeDetail} isTeacher={true} />
