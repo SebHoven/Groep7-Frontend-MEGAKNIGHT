@@ -1,4 +1,3 @@
-<!-- src/routes/register/+page.svelte -->
 <script>
     import { goto } from '$app/navigation';
     import RegisterCard from '$lib/components/RegisterCard.svelte';
@@ -8,27 +7,27 @@
     let email = '';
     let password = '';
     let confirmPassword = '';
+    let role = 'student';
     
     let message = '';
     let isError = false;
     let isLoading = false;
 
     async function handleRegister() {
-        // Validation
         if (!name || !email || !password || !confirmPassword) {
-            message = 'Please fill in all fields.';
+            message = 'Vul alsjeblieft alle velden in.';
             isError = true;
             return;
         }
 
         if (password !== confirmPassword) {
-            message = 'Passwords do not match.';
+            message = 'Wachtwoorden komen niet overeen.';
             isError = true;
             return;
         }
 
         if (password.length < 8) {
-            message = 'Password must be at least 8 characters long.';
+            message = 'Wachtwoord moet minstens 8 tekens zijn.';
             isError = true;
             return;
         }
@@ -37,23 +36,22 @@
         message = '';
         
         try {
-            const result = await authService.register(name, email, password);
+            // @ts-ignore
+            const result = await authService.register(name, email, password, role);
             
             if (result.success) {
-                message = 'Registration successful! Redirecting to login...';
+                message = 'Registratie successvol! Naar de login...';
                 isError = false;
-                console.log('Registration successful for:', email);
 
                 setTimeout(() => {
-                    goto('/login');
+                    goto('/');
                 }, 1500);
             } else {
-                message = result.message || 'Registration failed.';
+                message = result.message || 'Registratie mislukt.';
                 isError = true;
-                console.log('Registration failed for:', email);
             }
         } catch (error) {
-            message = 'Network error. Please make sure the backend is running.';
+            message = 'Netwerk fout. Probeer het later opnieuw.';
             isError = true;
             console.error('Registration error:', error);
         } finally {
@@ -70,6 +68,7 @@
         bind:email={email}
         bind:password={password}
         bind:confirmPassword={confirmPassword}
+        bind:role={role}
         message={message}
         isError={isError}
         isLoading={isLoading}

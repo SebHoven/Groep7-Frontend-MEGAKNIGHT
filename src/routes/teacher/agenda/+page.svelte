@@ -1,5 +1,6 @@
 <script>
   import Calendar from '$lib/components/Agenda.svelte';
+  import TaskDetail from '$lib/components/TaskDetail.svelte';
   import { onMount } from 'svelte';
   import { createTask } from '$lib/helpers/taskApi.js';
 
@@ -8,12 +9,25 @@
   let showForm = false;
   let prefillDate = '';
   let statusMessage = '';
+  let selectedTask = null;
+  let showDetail = false;
+
+  function openDetail(t) {
+    selectedTask = t;
+    showDetail = true;
+  }
+
+  function closeDetail() {
+    showDetail = false;
+    selectedTask = null;
+  }
 
   async function fetchTasks() {
     try {
       const res = await fetch(API);
       const json = await res.json();
       tasksy = json.data || [];
+      //console.log('Fetched tasks:', tasksy);
     } catch (err) {
       console.error(err);
     }
@@ -33,7 +47,8 @@
         date: taskData.date,
         icon: taskData.icon,
         teacherId: 1,
-        steps: stepsArray.map((stepDescription) => ({ description: stepDescription }))
+        steps: stepsArray.map((stepDescription) => ({ description: stepDescription })),
+        assignees: taskData.assignees
       };
 
       console.log('newTask being sent:', newTask);
@@ -65,7 +80,7 @@
 <h2 class="text-lg font-semibold mt-6 mb-2">Huidige Taken</h2>
 <div class="space-y-2">
   {#each tasksy as t}
-    <div class="p-3 bg-gray-100 rounded-lg shadow-sm flex items-center gap-2">
+    <div role="button" tabindex="0" on:click={() => openDetail(t)} class="p-3 bg-gray-100 rounded-lg shadow-sm flex items-center gap-2 cursor-pointer hover:bg-gray-200">
       <span class="text-2xl">{t.icon || '📌'}</span>
       <div>
         <div class="font-semibold">{t.name}</div>
@@ -79,3 +94,6 @@
     <div class="text-sm text-gray-500">Geen taken gevonden.</div>
   {/if}
 </div>
+
+<!-- Laat taak details zien -->
+<TaskDetail bind:open={showDetail} task={selectedTask} onClose={closeDetail} isTeacher={true} />
