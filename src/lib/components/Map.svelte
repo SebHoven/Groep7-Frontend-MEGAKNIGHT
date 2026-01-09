@@ -5,7 +5,6 @@
 
   let backgroundImage = '';
   let mapId: number | null = null;
-  import { page } from '$app/state';
   import TaskDetail from './TaskDetail.svelte';
 
   export let title: string = "Jouw Schoolplein";
@@ -16,6 +15,7 @@
   let aspect = 1;
 
   const API = `${PUBLIC_API_URL}/tasks`;
+  const MAPS_API = `${PUBLIC_API_URL}/maps`;
   let tasks: any[] = [];
   const task = JSON.parse(page.state.task || '{}');
 
@@ -50,12 +50,18 @@
   }
 
   async function loadMap() {
-    const res = await fetch('http://localhost:3012/maps/latest');
+    const res = await fetch(`${MAPS_API}/latest`);
     const map = await res.json();
 
     if (map) {
       mapId = map.id;
-      backgroundImage = `url(http://localhost:3012${map.imageUrl})`;
+      backgroundImage = `url(${PUBLIC_API_URL}${map.imageUrl})`;
+      
+      const img = new Image();
+      img.onload = () => {
+        aspect = img.width / img.height;
+      };
+      img.src = `${PUBLIC_API_URL}${map.imageUrl}`;
     }
   }
 
@@ -67,16 +73,21 @@
     formData.append('file', input.files[0]);
     formData.append('name', 'Schoolplein');
 
-    const res = await fetch('http://localhost:3012/maps', {
+    const res = await fetch(MAPS_API, {
       method: 'POST',
       body: formData
     });
 
     const map = await res.json();
     mapId = map.id;
-    backgroundImage = `url(http://localhost:3012${map.imageUrl})`;
-  }
-  reader.readAsDataURL(file);
+    backgroundImage = `url(${PUBLIC_API_URL}${map.imageUrl})`;
+    
+    // Load image to get dimensions for aspect ratio
+    const img = new Image();
+    img.onload = () => {
+      aspect = img.width / img.height;
+    };
+    img.src = `${PUBLIC_API_URL}${map.imageUrl}`;
   }
 
   function onMove(e: MouseEvent) {
@@ -126,14 +137,12 @@
 
   onMount(() => {
     fetchTasks();
+    loadMap();
   });
 </script>
 
-  onMount(loadMap);
-</script>
-
   {#if isTeacher}
-    <!-- File input bovenaan -->
+    <!-- File input -->
     <input 
       type="file"
       accept="image/*"
@@ -210,8 +219,6 @@
       {/if}
     {/each}
   </div>
-
-</div>
 
 <!-- Laat taak details zien -->
 <TaskDetail bind:open={showDetail} task={selectedTask} onClose={closeDetail} isTeacher={isTeacher} />

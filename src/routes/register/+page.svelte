@@ -44,7 +44,7 @@
                 isError = false;
 
                 setTimeout(() => {
-                    goto('/login');
+                    goto('/');
                 }, 1500);
             } else {
                 message = result.message || 'Registratie mislukt.';
