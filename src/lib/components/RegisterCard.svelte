@@ -1,10 +1,13 @@
+<!-- src/lib/components/RegisterCard.svelte -->
 <script>
     import { createEventDispatcher } from 'svelte';
 
     export let message = '';
     export let isError = false;
+    export let name = '';
     export let email = '';
     export let password = '';
+    export let confirmPassword = '';
     export let isLoading = false;
 
     const dispatch = createEventDispatcher();
@@ -14,11 +17,22 @@
     }
 </script>
 
-<div class="login-wrapper">
-    <div class="login-container">
-        <h2>Login</h2>
+<div class="register-wrapper">
+    <div class="register-container">
+        <h2>Maak Account</h2>
         
         <form on:submit|preventDefault={handleSubmit}>
+            <label for="name">Naam</label>
+            <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                required 
+                bind:value={name}
+                disabled={isLoading}
+                placeholder="Naam"
+            />
+
             <label for="email">Email</label>
             <input 
                 type="email" 
@@ -27,6 +41,7 @@
                 required 
                 bind:value={email}
                 disabled={isLoading}
+                placeholder="john@example.com"
             />
 
             <label for="password">Wachtwoord</label>
@@ -37,10 +52,22 @@
                 required 
                 bind:value={password}
                 disabled={isLoading}
+                placeholder="Tenminste 8 tekens"
+            />
+
+            <label for="confirmPassword">Bevestig Wachtwoord</label>
+            <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                required 
+                bind:value={confirmPassword}
+                disabled={isLoading}
+                placeholder="opnieuw wachtwoord invoeren"
             />
 
             <button type="submit" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Log In'}
+                {isLoading ? 'Creating account...' : 'Registreer'}
             </button>
         </form>
 
@@ -50,15 +77,14 @@
             </div>
         {/if}
 
-        <div class="register-link">
-            Nog geen account? <a href="/register">Registreer</a>
+        <div class="login-link">
+            Heb je al een account <a href="/login">Log in</a>
         </div>
     </div>
 </div>
 
 <style>
-    /* Wrapper to center the login card */
-    .login-wrapper {
+    .register-wrapper {
         min-height: 100vh;
         display: flex;
         justify-content: center;
@@ -67,8 +93,7 @@
         padding: 20px;
     }
 
-    /* Component-scoped CSS for styling with a green theme */
-    .login-container {
+    .register-container {
         max-width: 480px;
         width: 100%;
         padding: 30px; 
@@ -151,21 +176,21 @@
         border: 1px solid #b7e6c9;
     }
 
-    .register-link {
+    .login-link {
         text-align: center;
         margin-top: 20px;
         color: #388e3c;
         font-size: 0.95em;
     }
 
-    .register-link a {
+    .login-link a {
         color: #2e7d32;
         font-weight: bold;
         text-decoration: none;
         transition: color 0.3s ease;
     }
 
-    .register-link a:hover {
+    .login-link a:hover {
         color: #1b5e20;
         text-decoration: underline;
     }

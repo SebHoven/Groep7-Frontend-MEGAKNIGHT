@@ -1,21 +1,34 @@
 <script lang="ts">
-	// Vervang met echte data
-	const entries = [
-		{ name: 'Emma', xp: 100 },
-		{ name: 'Liam', xp: 10 },
-		{ name: 'Sophie', xp: 50 },
-		{ name: 'Lucas', xp: 1000 }
-	];
+    import { onMount } from 'svelte';
+    import { getLeaderboard } from "$lib/helpers/leaderboardApi";
 
-    // Sorteer XP
-	$: sortedEntries = [...entries].sort((a, b) => b.xp - a.xp);
+    type LeaderboardEntry = {
+        rank: number;
+        studentId: number;
+        name: string;
+        level: number;
+        xp: number;
+    };
 
-	// Medaille per rang
-	function medalFor(index: number) {
-		if (index === 0) return { text: '🏆', bg: 'bg-amber-50', textClass: 'text-amber-700' };
-		if (index === 1) return { text: '🥈', bg: 'bg-gray-100', textClass: 'text-gray-600' };
-		if (index === 2) return { text: '🥉', bg: 'bg-orange-50', textClass: 'text-orange-600' };
-		return { text: `#${index + 1}`, bg: 'bg-emerald-50', textClass: 'text-emerald-600' };
+    let leaderboard: LeaderboardEntry[] = [];
+
+	async function fetchLeaderboard() {
+		try {
+			const json = await getLeaderboard(); 
+			leaderboard = json.data || [];
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+    onMount(fetchLeaderboard);
+
+	// Medaille per rank
+	function medalFor(rank: number) {
+		if (rank === 1) return { text: '🏆', bg: 'bg-amber-50', textClass: 'text-amber-700' };
+		if (rank === 2) return { text: '🥈', bg: 'bg-gray-100', textClass: 'text-gray-600' };
+		if (rank === 3) return { text: '🥉', bg: 'bg-orange-50', textClass: 'text-orange-600' };
+		return { text: `#${rank}`, bg: 'bg-emerald-50', textClass: 'text-emerald-600' };
 	}
 
 	// sample rewards list (replace with real data)
@@ -119,12 +132,12 @@
 
 	<!-- Leaderboard (after rewards) -->
 	<div class="space-y-6">
-		{#each sortedEntries as entry, i}
+		{#each leaderboard as entry, i}
 			<article class="rounded-xl bg-white border border-emerald-100 shadow-sm p-6">
 				<div class="flex items-center justify-between gap-4">
 					<div class="flex items-center gap-4">
-						<div class="w-12 h-12 rounded-full flex items-center justify-center border border-emerald-100 {medalFor(i).bg}">
-							<span class="{medalFor(i).textClass} font-semibold text-sm">{medalFor(i).text}</span>
+						<div class="w-12 h-12 rounded-full flex items-center justify-center border border-emerald-100 {medalFor(entry.rank).bg}">
+							<span class="{medalFor(entry.rank).textClass} font-semibold text-sm">{medalFor(entry.rank).text}</span>
 						</div>
 						<div>
 							<div class="font-semibold text-emerald-900">{entry.name}</div>
@@ -133,13 +146,14 @@
 					</div>
 
 					<div class="flex items-center gap-3">
-						<div class="bg-emerald-600 text-white text-xs px-3 py-1 rounded-full">Level 1</div>
+						<div class="bg-emerald-600 text-white text-xs px-3 py-1 rounded-full">Level {entry.level}</div>
 					</div>
 				</div>
 
 				<div class="mt-4">
 					<div class="h-2 bg-emerald-50 rounded-full border border-emerald-100">
-						<div class="h-2 bg-emerald-200 rounded-full" style="width: 12%"></div>
+						<!-- Ieder level is 300xp -->
+						<div class="h-2 bg-emerald-200 rounded-full" style="width: { entry.xp / 300 * 100 }%"></div>
 					</div>
 				</div>
 			</article>
