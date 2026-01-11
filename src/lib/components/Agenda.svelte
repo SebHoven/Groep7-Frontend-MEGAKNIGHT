@@ -170,7 +170,11 @@
     onClose={() => showForm = false}
     onSubmit={(data) => {
       showForm = false;
-      dispatch('taskSubmit', data);
+      goto('/teacher/home', {
+        state: {
+          task: JSON.stringify(data)
+        }
+      });
     }}
     {prefillDate}
   />
