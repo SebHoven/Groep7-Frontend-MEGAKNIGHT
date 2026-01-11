@@ -15,23 +15,34 @@
   let monthGrid = [];
   let monthLabel = '';
 
-  // -------- FETCH TASKS ----------
-  async function fetchTasks() {
-    try {
-      const res = await fetch(API);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const json = await res.json();
-      tasksy = json.data || [];
-      buildMonthGrid();
-      dispatch('tasksUpdated', tasksy);
-    } catch (err) {
-      statusMessage = 'Error loading tasks: ' + err.message;
+  // Note: tasks are provided by the parent via the `tasksy` prop.
+  // Normalization helper for various date formats
+  function pad(n) {
+    return n.toString().padStart(2, '0');
+  }
+
+  function normalizeDateString(s) {
+    if (!s) return null;
+    // already YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    // ISO with time
+    if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.slice(0, 10);
+    const parts = s.split(/[-\/]/);
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        const [y, m, d] = parts; return `${y}-${pad(m)}-${pad(d)}`;
+      } else if (parts[2].length === 4) {
+        const [d, m, y] = parts; return `${y}-${pad(m)}-${pad(d)}`;
+      }
     }
+    const dt = new Date(s);
+    if (!isNaN(dt)) return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
+    return null;
   }
 
   // -------- CALENDAR GRID ----------
   function isoDate(d) {
-    return d.toISOString().slice(0, 10);
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   }
 
   function buildMonthGrid() {
@@ -65,8 +76,10 @@
     const map = {};
     tasksy.forEach(t => {
       if (!t.date) return;
-      if (!map[t.date]) map[t.date] = [];
-      map[t.date].push(t);
+      const nd = normalizeDateString(t.date);
+      if (!nd) return;
+      if (!map[nd]) map[nd] = [];
+      map[nd].push(t);
     });
 
     grid.forEach(c => c.tasks = map[c.date] || []);
@@ -90,8 +103,11 @@
 
   $: monthLabel = currentDate.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
 
+  // Rebuild the month grid whenever the incoming tasks change
+  $: if (tasksy) buildMonthGrid();
+
   onMount(() => {
-    fetchTasks();
+    buildMonthGrid();
   });
 </script>
 
@@ -133,7 +149,9 @@
 
         <div class="mt-1 flex-1 space-y-1">
           {#each cell.tasks.slice(0, 2) as t}
-            <div class="text-xs bg-green-50 text-green-800 rounded px-2 py-1 flex items-center gap-2">
+            <div class="text-xs bg-green-50 text-green-800 rounded px-2 py-1 flex items-center gap-2 cursor-pointer"
+                 on:click|stopPropagation={() => dispatch('openTask', t)}
+            >
               <span class="text-lg">{t.icon || '📌'}</span>
               <div class="truncate">{t.name}</div>
             </div>
@@ -152,7 +170,6 @@
     onClose={() => showForm = false}
     onSubmit={(data) => {
       showForm = false;
-
       goto('/teacher/home', {
         state: {
           task: JSON.stringify(data)

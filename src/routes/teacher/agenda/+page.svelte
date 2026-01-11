@@ -26,7 +26,23 @@
     try {
       const res = await fetch(API);
       const json = await res.json();
-      tasksy = json.data || [];
+      // Normalize dates to YYYY-MM-DD so the calendar matches correctly
+      function pad(n) { return n.toString().padStart(2, '0'); }
+      function normalizeDateString(s) {
+        if (!s) return null;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+        if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.slice(0,10);
+        const parts = s.split(/[-\/]/);
+        if (parts.length === 3) {
+          if (parts[0].length === 4) { const [y,m,d]=parts; return `${y}-${pad(m)}-${pad(d)}`; }
+          if (parts[2].length === 4) { const [d,m,y]=parts; return `${y}-${pad(m)}-${pad(d)}`; }
+        }
+        const dt = new Date(s);
+        if (!isNaN(dt)) return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
+        return s;
+      }
+
+      tasksy = (json.data || []).map(t => ({ ...t, date: normalizeDateString(t.date) || t.date }));
       //console.log('Fetched tasks:', tasksy);
     } catch (err) {
       console.error(err);
@@ -74,6 +90,7 @@
   bind:prefillDate
   {tasksy}
   on:taskSubmit={handleTaskSubmit}
+  on:openTask={(e) => openDetail(e.detail)}
 />
 
 <!-- Huidige taken onder kalender -->
