@@ -8,6 +8,7 @@
   export let tasksy = [];
   export let showForm = false;
   export let prefillDate = '';
+  export let teacherId; // Add this prop
 
   const dispatch = createEventDispatcher();
   let statusMessage = '';
@@ -126,6 +127,9 @@
         class="min-h-[70px] rounded-lg border p-2 bg-white hover:shadow cursor-pointer flex flex-col"
         class:bg-gray-50={!cell.inMonth}
         on:click={() => openNewTaskFor(cell.date)}
+        role="button"
+        tabindex="0"
+        on:keydown={(e) => e.key === 'Enter' && openNewTaskFor(cell.date)}
       >
         <div class="flex justify-between items-start">
           <div class="text-xs font-medium">{cell.day}</div>
@@ -149,6 +153,7 @@
   
   <TaskModal
     bind:open={showForm}
+    {teacherId}
     onClose={() => showForm = false}
     onSubmit={(data) => {
       showForm = false;
