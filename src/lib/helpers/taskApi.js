@@ -9,9 +9,3 @@ export const deleteTask = (/** @type {any} */ id) => deleteData(`${PUBLIC_API_UR
 export const completeTask = (/** @type {any} */ id) => putData(`${PUBLIC_API_URL}/tasks/${id}/complete`);
 
 export const toggleTaskStep = (/** @type {any} */ id) => putData(`${PUBLIC_API_URL}/tasksteps/${id}/toggle`);
-
-export const assignStudentsToTask = (/** @type {any} */ taskId, /** @type {any} */ studentIds) => 
-  postData(`${PUBLIC_API_URL}/tasks/${taskId}/students`, { studentIds });
-
-export const removeStudentFromTask = (/** @type {any} */ taskId, /** @type {any} */ studentId) => 
-  deleteData(`${PUBLIC_API_URL}/tasks/${taskId}/students/${studentId}`);
