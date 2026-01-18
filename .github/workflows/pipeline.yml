@@ -1,40 +1,74 @@
-name: Svelte Development Pipeline
+name: Svelte CI Pipeline
 
-# 1.2 Trigger pipeline on push or PR to main
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  build-and-test:
+  quality-build-package:
     runs-on: ubuntu-latest
+
     env:
-      PUBLIC_API_URL: "http://localhost:3012"
+      PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
 
     steps:
-      # Get project code
+      # 1. Checkout source
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Install Node.js (Svelte / SvelteKit recommended versions)
+      # 2. Setup Node
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # Install dependencies
+      # 3. Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Build Svelte or SvelteKit app
-      - name: Build Svelte application
-        run: npm run build
+      # 4. Linting
+      - name: Run linter
+        run: npm run lint
 
-      # Optional: run tests if your Svelte repo uses Vitest / Playwright / etc.
-      - name: Run tests
+      # 5. Unit tests
+      - name: Run unit tests
         run: npm test
 
-      # 1.3 Developer notifications are automatic
-      # GitHub will automatically notify commit authors & PR owners
+      # 6. Tests with coverage
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      # 7. Upload coverage artifact
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
+      # 8. Build application
+      - name: Build application
+        run: npm run build
+
+      # 9. Upload build artifact
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: svelte-build
+          path: build/
+
+      # 10. Static code analysis
+      # - name: SonarCloud Scan
+      #   uses: SonarSource/sonarcloud-github-action@v2
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # 11. Containerization
+      - name: Build Docker image
+        run: docker build -t svelte-app .
+
+      # 12. Failure notification
+      - name: Notify on failure
+        if: failure()
+        run: echo "❌ CI pipeline failed – GitHub notifications sent."
