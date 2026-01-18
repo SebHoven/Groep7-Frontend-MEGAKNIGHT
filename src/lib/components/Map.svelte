@@ -2,13 +2,13 @@
   import { PUBLIC_API_URL } from '$env/static/public';
   import { page } from '$app/state';
   import { onMount } from 'svelte';
+  import type { Task } from '$lib/types';
 
   let backgroundImage = '';
-  let mapId: number | null = null;
   import TaskDetail from './TaskDetail.svelte';
 
   export let title: string = "Jouw Schoolplein";
-  export let createTask: (data: any) => Promise<any>;
+  export let createTask: (data: Task) => Promise<void>;
   export let isTeacher: boolean = false;
 
   // map image
@@ -16,16 +16,16 @@
 
   const API = `${PUBLIC_API_URL}/tasks`;
   const MAPS_API = `${PUBLIC_API_URL}/maps`;
-  let tasks: any[] = [];
+  let tasks: Task[] = [];
   const task = JSON.parse(page.state.task || '{}');
 
   let placing = !!task.name;
   let pin = null as null | { x: number; y: number };
   let hover = { x: 0, y: 0 };
-  let selectedTask = null;
+  let selectedTask: Task | null = null;
   let showDetail = false;
 
-  function openDetail(task: any) {
+  function openDetail(task: Task) {
     selectedTask = task;
     showDetail = true;
   }
@@ -35,7 +35,7 @@
     selectedTask = null;
   }
 
-  function isLate(task: any) {
+  function isLate(task: Task) {
     return new Date(task.date) < new Date() && !task.completed;
   }
 
@@ -54,7 +54,6 @@
     const map = await res.json();
 
     if (map) {
-      mapId = map.id;
       backgroundImage = `url(${PUBLIC_API_URL}${map.imageUrl})`;
       
       const img = new Image();
@@ -79,7 +78,6 @@
     });
 
     const map = await res.json();
-    mapId = map.id;
     backgroundImage = `url(${PUBLIC_API_URL}${map.imageUrl})`;
     
     // Load image to get dimensions for aspect ratio
@@ -191,7 +189,7 @@
       </div>
     {/if}
 
-    {#each tasks as t}
+    {#each tasks as t (t.id)}
       {#if t.x !== undefined && t.y !== undefined}
         <div
           class="absolute cursor-pointer"

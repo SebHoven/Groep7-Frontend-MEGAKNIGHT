@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
+    import { resolve } from '$app/paths';
 
     export let message = '';
     export let isError = false;
@@ -51,7 +52,7 @@
         {/if}
 
         <div class="register-link">
-            Nog geen account? <a href="/register">Registreer</a>
+            Nog geen account? <a href={resolve("/register")}>Registreer</a>
         </div>
     </div>
 </div>

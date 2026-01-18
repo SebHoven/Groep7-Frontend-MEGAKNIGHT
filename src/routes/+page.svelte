@@ -1,5 +1,6 @@
 <script>
     import { goto } from '$app/navigation';
+    import { resolve } from '$app/paths';
     import { authService } from '$lib/services/loginService';
 
     let activeTab = 'login';
@@ -35,9 +36,9 @@
             if (result.success) {
                 // Role-based redirect
                 if (result.role === 'teacher') {
-                    goto('/teacher/home');
+                    goto(resolve('/teacher/home'));
                 } else {
-                    goto('/student/home');
+                    goto(resolve('/student/home'));
                 }
             } else {
                 loginError = result.message || 'Invalid email or password.';
@@ -74,7 +75,6 @@
         registerMessage = '';
         
         try {
-            // @ts-ignore
             const result = await authService.register(registerName, registerEmail, registerPassword, registerRole);
             
             if (result.success) {

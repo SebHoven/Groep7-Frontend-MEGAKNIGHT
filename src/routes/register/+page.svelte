@@ -1,5 +1,6 @@
 <script>
     import { goto } from '$app/navigation';
+    import { resolve } from '$app/paths';
     import RegisterCard from '$lib/components/RegisterCard.svelte';
     import { authService } from '$lib/services/loginService';
 
@@ -36,7 +37,6 @@
         message = '';
         
         try {
-            // @ts-ignore
             const result = await authService.register(name, email, password, role);
             
             if (result.success) {
@@ -44,7 +44,7 @@
                 isError = false;
 
                 setTimeout(() => {
-                    goto('/');
+                    goto(resolve('/'));
                 }, 1500);
             } else {
                 message = result.message || 'Registratie mislukt.';

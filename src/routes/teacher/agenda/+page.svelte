@@ -35,7 +35,7 @@
         if (!s) return null;
         if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
         if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.slice(0,10);
-        const parts = s.split(/[-\/]/);
+        const parts = s.split(/[-\/]/); //eslint-disable-line no-useless-escape
         if (parts.length === 3) {
           if (parts[0].length === 4) { const [y,m,d]=parts; return `${y}-${pad(m)}-${pad(d)}`; }
           if (parts[2].length === 4) { const [d,m,y]=parts; return `${y}-${pad(m)}-${pad(d)}`; }
@@ -107,7 +107,7 @@
 <!-- Huidige taken onder kalender -->
 <h2 class="text-lg font-semibold mt-6 mb-2">Huidige Taken</h2>
 <div class="space-y-2">
-  {#each tasksy as t}
+  {#each tasksy as t (t.id)}
     <div role="button" tabindex="0" on:click={() => openDetail(t)} on:keydown={(e) => e.key === 'Enter' && openDetail(t)} class="p-3 bg-gray-100 rounded-lg shadow-sm flex items-center gap-2 cursor-pointer hover:bg-gray-200">
       <span class="text-2xl">{t.icon || '📌'}</span>
       <div>

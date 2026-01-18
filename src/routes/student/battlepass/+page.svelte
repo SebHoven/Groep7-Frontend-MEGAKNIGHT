@@ -102,7 +102,7 @@
 
 	<!-- Rewards grid (under 'Alle Beloningen') -->
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-		{#each rewards as r}
+		{#each rewards as r (r.title)}
 			<div class="rounded-xl bg-white border border-emerald-100 shadow-sm p-5 flex items-start gap-4">
 				<div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center border border-emerald-100 text-lg">{r.icon}</div>
 				<div class="flex-1">
@@ -132,7 +132,7 @@
 
 	<!-- Leaderboard (after rewards) -->
 	<div class="space-y-6">
-		{#each leaderboard as entry, i}
+		{#each leaderboard as entry (entry.studentId)}
 			<article class="rounded-xl bg-white border border-emerald-100 shadow-sm p-6">
 				<div class="flex items-center justify-between gap-4">
 					<div class="flex items-center gap-4">
