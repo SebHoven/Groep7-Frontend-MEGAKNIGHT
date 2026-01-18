@@ -11,6 +11,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest",
+		"test:coverage": "vitest run --coverage",
 		"lint": "eslint ."
 	},
 	"devDependencies": {
@@ -20,6 +21,7 @@
 		"@sveltejs/kit": "^2.47.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/postcss": "^4.1.17",
+		"@vitest/coverage-v8": "^4.0.17",
 		"autoprefixer": "^10.4.22",
 		"eslint": "^9.39.2",
 		"eslint-plugin-svelte": "^3.14.0",
