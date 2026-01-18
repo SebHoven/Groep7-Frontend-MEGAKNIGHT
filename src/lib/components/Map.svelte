@@ -100,7 +100,7 @@
     };
   }
 
-  function placePin(e: MouseEvent) {
+  async function placePin(e: MouseEvent) {
     if (!placing) return;
 
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -125,14 +125,22 @@
       y: pin.y
     };
 
-    createTask(newTask).then(() => {
+    try {
+      await createTask(newTask);
       console.log('Task placed and saved:', newTask);
-      tasks = [...tasks, newTask];
+      
+      // Refresh the tasks list to show the newly created task
+      await fetchTasks();
+      
+      // Reset pin and placing state
       pin = null;
       placing = false;
-    }).catch(err => {
+    } catch (err) {
       console.error('Error saving task:', err);
-    });
+      // Reset state even on error
+      pin = null;
+      placing = false;
+    }
   }
 
   onMount(() => {
@@ -222,4 +230,3 @@
 
 <!-- Laat taak details zien -->
 <TaskDetail bind:open={showDetail} task={selectedTask} onClose={closeDetail} isTeacher={isTeacher} />
-

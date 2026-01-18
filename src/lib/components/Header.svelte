@@ -1,5 +1,33 @@
 <script>
-  export let user = { username: "test", role: "Leerling", xp: 0 };
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
+
+  let user = $state({ username: "Laden...", role: "...", xp: 0 });
+
+  onMount(async () => {
+    if (browser) {
+      // Get user data from localStorage (assuming you store it after login)
+      const userData = localStorage.getItem('user');
+      
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        user = {
+          username: parsedUser.name || parsedUser.email || "Gebruiker",
+          role: parsedUser.role === 'teacher' ? 'Leraar' : 'Leerling',
+          xp: parsedUser.xp || 0
+        };
+      }
+    }
+  });
+
+  function handleLogout() {
+    if (browser) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      goto('/');
+    }
+  }
 </script>
 
 <header class="w-full bg-green-700 text-white px-4 py-2 flex items-center justify-between">
@@ -23,7 +51,11 @@
     </div>
 
     <!-- LOGOUT ICON -->
-    <button class="text-xl opacity-90 hover:opacity-100">
+    <button 
+      onclick={handleLogout}
+      class="text-xl opacity-90 hover:opacity-100"
+      title="Uitloggen"
+    >
       ⏏
     </button>
   </div>

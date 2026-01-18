@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { completeTask, toggleTaskStep, updateTask } from '$lib/helpers/taskApi.js';
+  import { completeTask, toggleTaskStep, updateTask, deleteTask } from '$lib/helpers/taskApi.js';
 
   interface Props {
     open?: boolean;
@@ -10,13 +10,42 @@
 
   let { open = $bindable(false), task = $bindable(null), isTeacher = false, onClose = () => {} }: Props = $props();
 
+  // Debug: Log task data when it changes
+  $effect(() => {
+    if (task) {
+      console.log('Task data in TaskDetail:', task);
+      console.log('TaskStudent data:', task.taskstudent);
+    }
+  });
+
   async function completeCurrentTask() {
     if (!task) return;
     try {
       await completeTask(task.id);
       onClose();
+      // Optionally reload the page or emit an event to refresh tasks
+      window.location.reload();
     } catch (err) {
       console.error('Error completing task:', err);
+    }
+  }
+
+  async function handleDeleteTask() {
+    if (!task) return;
+    
+    if (!confirm('Weet je zeker dat je deze taak wilt verwijderen?')) {
+      return;
+    }
+
+    try {
+      await deleteTask(task.id);
+      console.log('Task deleted successfully');
+      onClose();
+      // Reload the page to refresh the task list
+      window.location.reload();
+    } catch (err) {
+      console.error('Error deleting task:', err);
+      alert('Kon taak niet verwijderen');
     }
   }
 
@@ -30,7 +59,12 @@
         {#if isTeacher}
           <div class="flex items-center gap-2">
             <button class="px-3 py-1 border rounded text-emerald-700">Bewerken</button>
-            <button class="px-3 py-1 bg-red-600 text-white rounded">Verwijderen</button>
+            <button 
+              onclick={handleDeleteTask}
+              class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+            >
+              Verwijderen
+            </button>
           </div>
         {/if}
       </div>
@@ -47,12 +81,20 @@
       </div>
 
       <div class="text-sm text-gray-700 mb-4">
-        <div class="flex items-center gap-2 mb-2"><span class="text-gray-500">📅</span> Datum: <span class="ml-1 font-medium">{task.date ? new Date(task.date).toLocaleDateString('nl-NL') : 'Geen datum'}</span></div>
-        <div class="flex items-center gap-2"><span class="text-gray-500">👤</span> Toegewezen aan: 
-          {#if task.taskstudent && task.taskstudent.length}
-            <span class="ml-1 font-medium">{task.taskstudent.map((ts: any) => ts.student.name).join(', ')}</span>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-gray-500">📅</span> Datum: 
+          <span class="ml-1 font-medium">
+            {task.date ? new Date(task.date).toLocaleDateString('nl-NL') : 'Geen datum'}
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-500">👤</span> Toegewezen aan: 
+          {#if task.taskstudent && task.taskstudent.length > 0}
+            <span class="ml-1 font-medium">
+              {task.taskstudent.map((ts) => ts.student?.name || 'Onbekend').join(', ')}
+            </span>
           {:else}
-            <span class="ml-1 font-medium">Niet toegewezen</span>
+            <span class="ml-1 font-medium text-gray-500">Niet toegewezen</span>
           {/if}
         </div>
       </div>
@@ -76,7 +118,15 @@
         disabled={isDisabled}
         onclick={completeCurrentTask}
       >
-        {#if !task.completed}{#if isTeacher}Voltooi taak{/if}{#if !isTeacher}Alleen leraar kan voltooien{/if}{/if}{#if task.completed}Taak is voltooid!{/if}
+        {#if !task.completed}
+          {#if isTeacher}
+            Voltooi taak
+          {:else}
+            Alleen leraar kan voltooien
+          {/if}
+        {:else}
+          Taak is voltooid!
+        {/if}
       </button>
     {/if}
   </aside>
