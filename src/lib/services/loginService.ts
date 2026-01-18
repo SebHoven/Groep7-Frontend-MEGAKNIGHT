@@ -60,14 +60,14 @@ export const authService = {
   },
 
   getToken() {
-    if (typeof window !== 'undefined') {
+    if (typeof globalThis.window !== 'undefined') {
       return localStorage.getItem('token');
     }
     return null;
   },
 
   getUser(): User | null {
-    if (typeof window !== 'undefined') {
+    if (typeof globalThis.window !== 'undefined') {
       const userData = localStorage.getItem('user');
       return userData ? JSON.parse(userData) : null;
     }
@@ -75,7 +75,7 @@ export const authService = {
   },
 
   logout() {
-    if (typeof window !== 'undefined') {
+    if (typeof globalThis.window !== 'undefined') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
