@@ -58,11 +58,11 @@ jobs:
           name: svelte-build
           path: build/
 
-      # 11. Containerization
+      # 10. Containerization
       - name: Build Docker image
         run: docker build --build-arg PUBLIC_API_URL=${{ secrets.PUBLIC_API_URL }} -t svelte-app .
 
-      # 12. Failure notification
+      # 11. Failure notification
       - name: Notify on failure
         if: failure()
         run: echo "❌ CI pipeline failed – GitHub notifications sent."
