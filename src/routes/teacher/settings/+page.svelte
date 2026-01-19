@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { getGroups, createGroup, deleteGroup, removeStudentFromGroup, addStudentToGroup, getUnassignedStudents } from '$lib/helpers/groupApi.js';
-  import { PUBLIC_API_URL } from '$env/static/public';
+    import type { Group, Student } from '$lib/types';
 
   // State variables
-  let groups: any[] = [];
-  let students: any[] = [];
+  let groups: Group[] = [];
+  let students: Student[] = [];
   let newGroupName = '';
   let selectedGroupId: number | null = null;
   let selectedStudentId: number | null = null;
@@ -180,7 +180,7 @@ async function handleAddStudent() {
       disabled={loading || groups.length === 0}
     >
       <option value={null}>Kies een groep</option>
-      {#each groups as group}
+      {#each groups as group (group.id)}
         <option value={group.id}>{group.name}</option>
       {/each}
     </select>
@@ -195,7 +195,7 @@ async function handleAddStudent() {
       disabled={loading || students.length === 0 || !selectedGroupId}
     >
       <option value={null}>Kies een leerling</option>
-      {#each students as student}
+      {#each students as student (student.id)}
         <option value={student.id}>{student.name}</option>
       {/each}
     </select>
@@ -226,7 +226,7 @@ async function handleAddStudent() {
     <p class="text-gray-600">Nog geen groepen aangemaakt</p>
   </div>
 {:else}
-  {#each groups as group}
+  {#each groups as group (group.id)}
     <section class="max-w-4xl mx-auto rounded-xl border border-black bg-white shadow-sm overflow-hidden mb-4">
       <div class="p-4">
         <div class="flex justify-between items-start mb-2">
@@ -247,7 +247,7 @@ async function handleAddStudent() {
 
         {#if group.students && group.students.length > 0}
           <ul class="space-y-2">
-            {#each group.students as student}
+            {#each group.students as student (student.id)}
               <li class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 hover:bg-gray-100">
                 <span class="text-sm text-gray-800">{student.name}</span>
                 <button

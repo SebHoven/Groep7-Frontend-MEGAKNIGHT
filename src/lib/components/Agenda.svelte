@@ -1,6 +1,7 @@
-<script>
+<script lang="ts">
   // @ts-nocheck
   import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
   import TaskModal from '$lib/components/AddTask.svelte';
   import { onMount, createEventDispatcher } from 'svelte';
 
@@ -28,7 +29,7 @@
     if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
     // ISO with time
     if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.slice(0, 10);
-    const parts = s.split(/[-\/]/);
+    const parts = s.split(/[-\/]/); //eslint-disable-line no-useless-escape
     if (parts.length === 3) {
       if (parts[0].length === 4) {
         const [y, m, d] = parts; return `${y}-${pad(m)}-${pad(d)}`;
@@ -39,7 +40,7 @@
     const dt = new Date(s);
     if (!isNaN(dt)) return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
     return null;
-  }
+  } 
 
   // -------- CALENDAR GRID ----------
   function isoDate(d) {
@@ -138,7 +139,7 @@
 
   <!-- Calendar grid -->
   <div class="grid grid-cols-7 gap-2">
-    {#each monthGrid as cell}
+    {#each monthGrid as cell (cell.date)}
       <div
         class="min-h-[70px] rounded-lg border p-2 bg-white hover:shadow cursor-pointer flex flex-col"
         class:bg-gray-50={!cell.inMonth}
@@ -152,7 +153,7 @@
         </div>
 
         <div class="mt-1 flex-1 space-y-1">
-          {#each cell.tasks.slice(0, 2) as t}
+          {#each cell.tasks.slice(0, 2) as t (t.id)}
             <div class="text-xs bg-green-50 text-green-800 rounded px-2 py-1 flex items-center gap-2 cursor-pointer"
                  on:click|stopPropagation={() => dispatch('openTask', t)}
             >
@@ -175,10 +176,10 @@
     onClose={() => showForm = false}
     onSubmit={(data) => {
       showForm = false;
-      goto('/teacher/home', {
+      goto(resolve('/teacher/home'), {
         state: {
           task: JSON.stringify(data)
-        }
+        },
       });
     }}
     {prefillDate}

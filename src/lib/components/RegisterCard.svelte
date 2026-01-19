@@ -1,4 +1,5 @@
 <script>
+    import { resolve } from '$app/paths';
     import { createEventDispatcher } from 'svelte';
 
     export let message = '';
@@ -98,7 +99,7 @@
         {/if}
 
         <div class="login-link">
-            Al een account? <a href="/login">Log in</a>
+            Al een account? <a href={resolve("/")}>Log in</a>
         </div>
     </div>
 </div>

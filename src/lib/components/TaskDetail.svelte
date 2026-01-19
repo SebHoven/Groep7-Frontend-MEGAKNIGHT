@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { completeTask, toggleTaskStep, updateTask } from '$lib/helpers/taskApi.js';
+  import { completeTask, toggleTaskStep } from '$lib/helpers/taskApi.js';
+    import type { Task } from '$lib/types';
 
   interface Props {
-    open?: boolean;
-    task?: any;
+    open: boolean;
+    task?: Task | null;
     isTeacher?: boolean;
     onClose?: () => void;
   }
@@ -49,8 +50,8 @@
       <div class="text-sm text-gray-700 mb-4">
         <div class="flex items-center gap-2 mb-2"><span class="text-gray-500">📅</span> Datum: <span class="ml-1 font-medium">{task.date ? new Date(task.date).toLocaleDateString('nl-NL') : 'Geen datum'}</span></div>
         <div class="flex items-center gap-2"><span class="text-gray-500">👤</span> Toegewezen aan: 
-          {#if task.taskstudent && task.taskstudent.length}
-            <span class="ml-1 font-medium">{task.taskstudent.map((ts: any) => ts.student.name).join(', ')}</span>
+          {#if task.students && task.students.length}
+            <span class="ml-1 font-medium">{task.students.map(ts => ts.student?.name).join(', ')}</span>
           {:else}
             <span class="ml-1 font-medium">Niet toegewezen</span>
           {/if}
@@ -59,8 +60,8 @@
 
       <h4 class="text-lg font-semibold mb-2">Stappen:</h4>
       <div class="space-y-3 mb-6">
-        {#if task.tasksteps && task.tasksteps.length}
-          {#each task.tasksteps as taskstep}
+        {#if task.tasksteps && task.tasksteps.length }
+          {#each task.tasksteps as taskstep (taskstep.id)}
             <label class="flex items-center gap-3 bg-emerald-50 p-3 rounded-lg">
               <input type="checkbox" checked={taskstep.completed} onchange={async () => { taskstep.completed = !taskstep.completed; await toggleTaskStep(taskstep.id); }} />
               <span class="text-sm">{taskstep.text}</span>

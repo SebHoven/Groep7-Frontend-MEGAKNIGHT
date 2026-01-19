@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { getGroupsByTeacher, getGroupStudents } from '$lib/helpers/groupApi.js'; // Adjust path as needed
+  import { getGroupsByTeacher, getGroupStudents } from '$lib/helpers/groupApi.js'; 
+
 
   interface Props {
     open?: boolean;
     onClose?: () => void;
-    onSubmit?: (task: any) => void;
+    onSubmit?: (task) => void;
     prefillDate?: string;
     teacherId: number; // Add teacherId prop
   }
@@ -127,9 +128,9 @@
     steps = steps.filter((_, i) => i !== index);
   }
 
-  function updateStep(index: number, value: string) {
-    steps[index] = value;
-  }
+  // function updateStep(index: number, value: string) {
+  //   steps[index] = value;
+  // }
 
   function cancel() {
     // Reset form
@@ -208,7 +209,7 @@
         bind:value={selectedType}
         class="w-full appearance-none rounded-lg border border-emerald-100 bg-emerald-50/30 px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-emerald-200"
       >
-        {#each typeOptions as t}
+        {#each typeOptions as t (t.id)}
           <option value={t.id}>{t.icon} {t.label}</option>
         {/each}
       </select>
@@ -231,25 +232,26 @@
     <fieldset class="mb-3">
       <legend class="block text-sm font-medium mb-2">Stappen</legend>
       <div class="space-y-2">
+        <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
         {#each steps as step, i (i)}
           <div class="flex items-center gap-2">
-            <input
+          <input
               id={"step-" + i}
               bind:value={steps[i]}
               class="flex-1 rounded-lg border border-emerald-100 bg-emerald-50/30 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-200"
               placeholder={"Stap " + (i + 1)}
               aria-label={"Stap " + (i + 1)}
             />
-            <button
-              type="button"
-              class="text-slate-500 hover:text-rose-500 p-1 rounded"
-              onclick={() => removeStep(i)}
-              aria-label={"Verwijder stap " + (i + 1)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H3.5a.5.5 0 000 1H4l.5 10A2 2 0 006.5 17h7a2 2 0 001.999-1.999L16 5h.5a.5.5 0 000-1H15V3a1 1 0 00-1-1H6zm2 4a.5.5 0 01.5.5V15a.5.5 0 01-1 0V6.5A.5.5 0 018 6zm4 0a.5.5 0 01.5.5V15a.5.5 0 01-1 0V6.5A.5.5 0 0112 6z" clip-rule="evenodd" />
-              </svg>
-            </button>
+          <button
+            type="button"
+            class="text-slate-500 hover:text-rose-500 p-1 rounded"
+            onclick={() => removeStep(i)}
+            aria-label={"Verwijder stap " + (i + 1)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H3.5a.5.5 0 000 1H4l.5 10A2 2 0 006.5 17h7a2 2 0 001.999-1.999L16 5h.5a.5.5 0 000-1H15V3a1 1 0 00-1-1H6zm2 4a.5.5 0 01.5.5V15a.5.5 0 01-1 0V6.5A.5.5 0 018 6zm4 0a.5.5 0 01.5.5V15a.5.5 0 01-1 0V6.5A.5.5 0 0112 6z" clip-rule="evenodd" />
+            </svg>
+          </button>
           </div>
         {/each}
       </div>
@@ -338,7 +340,7 @@
       onchange={(e) => handleGroupSelect(Number(e.currentTarget.value))}
     >
       <option value="">-- Kies een groep --</option>
-      {#each groups as group}
+      {#each groups as group (group.id)}
         <option value={group.id}>{group.name}</option>
       {/each}
     </select>
@@ -355,7 +357,7 @@
 
         <div class="text-sm font-medium mb-2">Of selecteer individuele leerlingen:</div>
         <div class="space-y-2">
-          {#each groupStudents as student}
+          {#each groupStudents as student (student.id)}
             <button
               type="button"
               onclick={() => addStudent(student)}
