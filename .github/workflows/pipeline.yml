@@ -58,6 +58,12 @@ jobs:
           name: svelte-build
           path: build/
 
+       # 10. Static code analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       # 10. Containerization
       - name: Build Docker image
         run: docker build --build-arg PUBLIC_API_URL=${{ secrets.PUBLIC_API_URL }} -t svelte-app .
