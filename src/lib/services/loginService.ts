@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3012';
+const API_URL = "https://groep7-backend-megaknight-ewi7.onrender.com";
 
 interface User {
   id: string;
