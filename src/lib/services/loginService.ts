@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
+import { PUBLIC_API_URL } from '$env/static/public';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3012';
+// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3012';
 
 interface User {
   id: string;
@@ -14,7 +15,7 @@ export const isAuthenticated = writable<boolean>(false);
 
 export const authService = {
   async login(email: string, password: string) {
-    const response = await fetch(`${API_URL}/login`, {
+    const response = await fetch(`${PUBLIC_API_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +43,7 @@ export const authService = {
   },
 
   async register(name: string, email: string, password: string, role: 'student' | 'teacher' = 'student') {
-    const response = await fetch(`${API_URL}/register`, {
+    const response = await fetch(`${PUBLIC_API_URL}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
