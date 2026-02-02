@@ -51,7 +51,7 @@
         <div class="flex items-center gap-2 mb-2"><span class="text-gray-500">📅</span> Datum: <span class="ml-1 font-medium">{task.date ? new Date(task.date).toLocaleDateString('nl-NL') : 'Geen datum'}</span></div>
         <div class="flex items-center gap-2"><span class="text-gray-500">👤</span> Toegewezen aan: 
           {#if task.students && task.students.length}
-            <span class="ml-1 font-medium">{task.students.map(ts => ts.student?.name).join(', ')}</span>
+            <span class="ml-1 font-medium">{task.students.map(s => s.name).join(', ')}</span>
           {:else}
             <span class="ml-1 font-medium">Niet toegewezen</span>
           {/if}
