@@ -9,7 +9,7 @@
   let newGroupName = '';
   let selectedGroupId: number | null = null;
   let selectedStudentId: number | null = null;
-  let teacherId = 1;
+  let teacherId = 2;
   let loading = false;
   let error = '';
 
