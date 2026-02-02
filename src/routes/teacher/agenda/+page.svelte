@@ -4,7 +4,8 @@
   import { onMount } from 'svelte';
   import { createTask } from '$lib/helpers/taskApi.js';
 
-  const API = 'http://localhost:3012/tasks';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const API = `${API_URL}/tasks`;
   let tasksy = [];
   let showForm = false;
   let prefillDate = '';
@@ -13,7 +14,7 @@
   let showDetail = false;
   
   // Add teacherId - you'll want to get this from your auth system
-  const teacherId = 1; // Replace with actual logged-in teacher ID
+  const teacherId = 2; // Replace with actual logged-in teacher ID
 
   function openDetail(t) {
     selectedTask = t;

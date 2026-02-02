@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3012';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 interface User {
   id: string;
