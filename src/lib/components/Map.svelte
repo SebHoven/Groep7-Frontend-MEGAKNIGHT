@@ -122,7 +122,7 @@
       xp: task.xp,
       date: task.date,
       icon: task.icon,
-      teacherId: 1,
+      teacherId: teacherId,
       steps: task.steps.map((s: string) => ({ description: s })),
       assignees: task.assignees,
       x: pin.x,

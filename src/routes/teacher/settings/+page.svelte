@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getGroups, createGroup, deleteGroup, removeStudentFromGroup, addStudentToGroup, getUnassignedStudents } from '$lib/helpers/groupApi.js';
-    import type { Group, Student } from '$lib/types';
+  import { getGroups, createGroup, deleteGroup, removeStudentFromGroup, addStudentToGroup, getUnassignedStudents, getTeacherByUserId } from '$lib/helpers/groupApi.js';
+  import type { Group, Student } from '$lib/types';
 
   // State variables
   let groups: Group[] = [];
@@ -9,15 +9,28 @@
   let newGroupName = '';
   let selectedGroupId: number | null = null;
   let selectedStudentId: number | null = null;
-  let teacherId = 1;
+  let teacherId = null;
   let loading = false;
   let error = '';
 
   // Load groups and students on mount
   onMount(async () => {
-    await fetchGroups();
-    await fetchStudents();
-  });
+  // Get user from localStorage
+  const userStr = localStorage.getItem('user');
+  if (userStr) {
+    const user = JSON.parse(userStr);
+    if (user.id) {
+      // Fetch teacher from groups service using auth userId
+      const teacherResponse = await getTeacherByUserId(user.id);
+      if (teacherResponse.success && teacherResponse.data) {
+        teacherId = teacherResponse.data.id;
+      }
+    }
+  }
+  
+  await fetchGroups();
+  await fetchStudents();
+});
 
   // Fetch all groups
   async function fetchGroups() {

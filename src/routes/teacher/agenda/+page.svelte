@@ -4,6 +4,8 @@
   import { onMount } from 'svelte';
   import { createTask } from '$lib/helpers/taskApi.js';
   import { PUBLIC_API_URL } from '$env/static/public';
+  import { getLoggedInTeacherId } from '$lib/helpers/teacherHelper.js';
+
 
   const API = `${PUBLIC_API_URL}/tasks`;
   let tasksy = [];
@@ -14,7 +16,7 @@
   let showDetail = false;
   
   // Add teacherId - you'll want to get this from your auth system
-  const teacherId = 1; // Replace with actual logged-in teacher ID
+  let teacherId = null; // Replace with actual logged-in teacher ID
 
   function openDetail(t) {
     selectedTask = t;
@@ -86,7 +88,14 @@
     }
   };
 
-  onMount(() => fetchTasks());
+  onMount(async () => {
+    teacherId = await getLoggedInTeacherId();
+    if (!teacherId) {
+      statusMessage = 'Teacher not synced. Please log out and log in again.';
+      return;
+    }
+    fetchTasks();
+  });
 </script>
 
 <Calendar
