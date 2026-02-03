@@ -3,8 +3,9 @@
   import TaskDetail from '$lib/components/TaskDetail.svelte';
   import { onMount } from 'svelte';
   import { createTask } from '$lib/helpers/taskApi.js';
+  import { PUBLIC_API_URL } from '$env/static/public';
 
-  const API = 'http://localhost:3012/tasks';
+  const API = `${PUBLIC_API_URL}/tasks`;
   let tasksy = [];
   let showForm = false;
   let prefillDate = '';

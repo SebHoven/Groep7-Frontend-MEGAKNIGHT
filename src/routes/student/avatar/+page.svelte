@@ -110,15 +110,88 @@
   <button class="bg-green-600 px-6 py-2 rounded-full text-white-700 border-2 border-green-500 hover:bg-green-50 hover:border-green-600 transition" on:click={() => setSkinColor('bg-green-600')}>Groen</button>
   <button class="bg-purple-300 px-6 py-2 rounded-full text-white-700 border-2 border-green-500 hover:bg-green-50 hover:border-green-600 transition" on:click={() => setSkinColor('bg-purple-300')}>Paars</button>
 </div>
+
+<br>
+<br>
+<div class="text-center">
+  <button 
+    class="px-8 py-3 rounded-full bg-green-600 text-white font-bold hover:bg-green-700 transition"
+    on:click={handleSaveAvatar}
+  >
+    Opslaan Avatar
+  </button>
+  {#if saveMessage}
+    <p class="mt-4 text-lg {saveMessageColor}">{saveMessage}</p>
+  {/if}
+</div>
 </div>
 
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { getAvatar, saveAvatar } from '$lib/helpers/avatarApi';
 
   let hairColor: string = "bg-yellow-800";
   let skinColor: string = "bg-green-200";
   let shirtColor: string = "bg-green-500";
   let pantsColor: string = "bg-blue-500";
   let shoeColor: string = "bg-black";
+  let saveMessage: string = "";
+  let saveMessageColor: string = "";
+  let studentId: number | null = null;
+
+  onMount(async () => {
+    // Get student ID from localStorage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.student?.id) {
+          studentId = user.student.id;
+          
+          // Load saved avatar
+          const result = await getAvatar(studentId);
+          if (result.success && result.data) {
+            const avatar = result.data;
+            if (avatar.hairColor) hairColor = avatar.hairColor;
+            if (avatar.skinColor) skinColor = avatar.skinColor;
+            if (avatar.shirtColor) shirtColor = avatar.shirtColor;
+            if (avatar.pantsColor) pantsColor = avatar.pantsColor;
+            if (avatar.shoeColor) shoeColor = avatar.shoeColor;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading avatar:', error);
+      }
+    }
+  });
+
+  async function handleSaveAvatar() {
+    if (!studentId) {
+      saveMessage = "Geen student ID gevonden. Log opnieuw in.";
+      saveMessageColor = "text-red-600";
+      return;
+    }
+
+    const result = await saveAvatar(studentId, {
+      hairColor,
+      skinColor,
+      shirtColor,
+      pantsColor,
+      shoeColor
+    });
+
+    if (result.success) {
+      saveMessage = "Avatar succesvol opgeslagen!";
+      saveMessageColor = "text-green-600";
+    } else {
+      saveMessage = "Fout bij opslaan avatar";
+      saveMessageColor = "text-red-600";
+    }
+
+    setTimeout(() => {
+      saveMessage = "";
+    }, 3000);
+  }
 
   function setHairColor(color: string): void {
     hairColor = color;

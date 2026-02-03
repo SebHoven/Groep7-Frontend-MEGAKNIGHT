@@ -10,6 +10,7 @@
   export let title: string = "Jouw Schoolplein";
   export let createTask: (data: Task) => Promise<void>;
   export let isTeacher: boolean = false;
+  export let teacherId: number = 1;
 
   // map image
   let aspect = 1;
@@ -47,6 +48,11 @@
     } catch (err) {
       console.error(err);
     }
+  }
+
+  function handleTaskUpdate() {
+    // Refresh tasks after update or delete
+    fetchTasks();
   }
 
   async function loadMap() {
@@ -219,5 +225,13 @@
   </div>
 
 <!-- Laat taak details zien -->
-<TaskDetail bind:open={showDetail} task={selectedTask} onClose={closeDetail} isTeacher={isTeacher} />
+<!-- Laat taak details zien -->
+<TaskDetail 
+  bind:open={showDetail} 
+  task={selectedTask} 
+  onClose={closeDetail} 
+  onUpdate={handleTaskUpdate}
+  isTeacher={isTeacher}
+  teacherId={teacherId}
+/>
 
