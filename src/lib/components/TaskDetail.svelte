@@ -290,7 +290,8 @@
         <fieldset class="mb-3">
           <legend class="block text-sm font-medium mb-2">Stappen</legend>
           <div class="space-y-2">  
-            {#each editedSteps as step, i (i)} <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
+            <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
+            {#each editedSteps as step, i (i)} 
               <div class="flex items-center gap-2">
                 <input
                   id={"edit-step-" + i}
