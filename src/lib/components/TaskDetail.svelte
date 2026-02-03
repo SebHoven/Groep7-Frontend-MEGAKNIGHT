@@ -12,10 +12,18 @@
     teacherId?: number;
   }
 
+    interface EditedTask {
+    name: string;
+    description: string;
+    date: string;
+    xp: number;
+    icon: string;
+  }
+
   let { open = $bindable(false), task = $bindable(null), isTeacher = false, onClose = () => {}, onUpdate = () => {}, teacherId = 1 }: Props = $props();
 
   let editMode = $state(false);
-  let editedTask = $state<any>({});
+  let editedTask = $state<EditedTask>({} as EditedTask);
   let showDeleteConfirm = $state(false);
   let showAssigneeModal = $state(false);
   let editedSteps = $state<string[]>([]);
@@ -281,8 +289,8 @@
         <!-- Steps Edit UI -->
         <fieldset class="mb-3">
           <legend class="block text-sm font-medium mb-2">Stappen</legend>
-          <div class="space-y-2">
-            {#each editedSteps as step, i (i)}
+          <div class="space-y-2">  
+            {#each editedSteps as step, i (i)} <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
               <div class="flex items-center gap-2">
                 <input
                   id={"edit-step-" + i}
