@@ -21,3 +21,6 @@ export const addStudentToGroup = (/** @type {any} */ groupId, /** @type {any} */
 // Remove student from group
 export const removeStudentFromGroup = (/** @type {any} */ groupId, /** @type {any} */ studentId) => 
   deleteData(`${PUBLIC_API_URL}/groups/${groupId}/students/${studentId}`);
+
+export const getTeacherByUserId = (/** @type {any} */ userId) => 
+  getData(`${PUBLIC_API_URL}/teachers/user/${userId}`);
